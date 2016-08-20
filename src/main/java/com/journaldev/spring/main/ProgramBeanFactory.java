@@ -6,10 +6,15 @@ import java.io.InputStream;
 import org.springframework.beans.factory.BeanDefinitionStoreException;
 import org.springframework.beans.factory.support.DefaultListableBeanFactory;
 import org.springframework.beans.factory.xml.BeanDefinitionDocumentReader;
+import org.springframework.beans.factory.xml.BeanDefinitionParserDelegate;
+import org.springframework.beans.factory.xml.DefaultBeanDefinitionDocumentReader;
 import org.springframework.beans.factory.xml.XmlBeanDefinitionReader;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.support.EncodedResource;
 import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
 
 import com.journaldev.spring.service.MyAwareService;
@@ -35,11 +40,36 @@ public class ProgramBeanFactory {
 				try {
 					Document doc = reader.doLoadDocument(inputSource, resource);
 					//reader.registerBeanDefinitions(doc, resource);
-					BeanDefinitionDocumentReader documentReader = reader.createBeanDefinitionDocumentReader();
+					DefaultBeanDefinitionDocumentReader documentReader = (DefaultBeanDefinitionDocumentReader)reader.createBeanDefinitionDocumentReader();
 					documentReader.setEnvironment(reader.getEnvironment());
 					int countBefore = reader.getRegistry().getBeanDefinitionCount();
-					documentReader.registerBeanDefinitions(doc, reader.createReaderContext(resource));
-					int res = reader.getRegistry().getBeanDefinitionCount() ;
+					//core code
+					//documentReader.registerBeanDefinitions(doc, reader.createReaderContext(resource));
+					documentReader.setReaderContext(reader.createReaderContext(resource));
+					Element root = doc.getDocumentElement();
+					//documentReader.doRegisterBeanDefinitions(root);
+					BeanDefinitionParserDelegate parent = documentReader.delegate;
+					documentReader.delegate = documentReader.createDelegate(documentReader.readerContext, root, parent);
+					//documentReader.parseBeanDefinitions(root, documentReader.delegate);
+					BeanDefinitionParserDelegate curDelegate = documentReader.delegate;
+					if (curDelegate.isDefaultNamespace(root)) {
+						
+						NodeList nl = root.getChildNodes();
+						for (int i = 0; i < nl.getLength(); i++) {
+							Node node = nl.item(i);
+							System.out.println(node.getBaseURI()+":" + node.getNodeName()+":"+node.getNodeValue());
+							if (node instanceof Element) {
+								Element ele = (Element) node;
+								if (curDelegate.isDefaultNamespace(ele)) {
+									//documentReader.parseDefaultElement(ele, curDelegate);
+									if (curDelegate.nodeNameEquals(ele, BeanDefinitionParserDelegate.BEAN_ELEMENT)) {
+										documentReader.processBeanDefinition(ele, curDelegate);
+									}
+								}
+							}
+						}
+					}
+					int res = reader.getRegistry().getBeanDefinitionCount() - countBefore ;
 					System.out.println("Find " + res + " beans in total");
 				}
 				catch (BeanDefinitionStoreException ex) {

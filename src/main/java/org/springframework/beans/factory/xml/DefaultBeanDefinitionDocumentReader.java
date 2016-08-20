@@ -79,9 +79,9 @@ public class DefaultBeanDefinitionDocumentReader implements BeanDefinitionDocume
 
 	private Environment environment;
 
-	private XmlReaderContext readerContext;
+	public XmlReaderContext readerContext;
 
-	private BeanDefinitionParserDelegate delegate;
+	public BeanDefinitionParserDelegate delegate;
 
 
 	/**
@@ -110,6 +110,10 @@ public class DefaultBeanDefinitionDocumentReader implements BeanDefinitionDocume
 		doRegisterBeanDefinitions(root);
 	}
 
+	public void setReaderContext(XmlReaderContext readerContext){
+		this.readerContext = readerContext;
+	}
+	
 
 	/**
 	 * Register each bean definition within the given root {@code <beans/>} element.
@@ -117,7 +121,7 @@ public class DefaultBeanDefinitionDocumentReader implements BeanDefinitionDocume
 	 * and Environment property has not been set
 	 * @see #setEnvironment
 	 */
-	protected void doRegisterBeanDefinitions(Element root) {
+	public void doRegisterBeanDefinitions(Element root) {
 		String profileSpec = root.getAttribute(PROFILE_ATTRIBUTE);
 		if (StringUtils.hasText(profileSpec)) {
 			Assert.state(this.environment != null, "Environment must be set for evaluating profiles");
@@ -144,7 +148,7 @@ public class DefaultBeanDefinitionDocumentReader implements BeanDefinitionDocume
 		this.delegate = parent;
 	}
 
-	protected BeanDefinitionParserDelegate createDelegate(
+	public BeanDefinitionParserDelegate createDelegate(
 			XmlReaderContext readerContext, Element root, BeanDefinitionParserDelegate parentDelegate) {
 
 		BeanDefinitionParserDelegate delegate = new BeanDefinitionParserDelegate(readerContext, this.environment);
@@ -155,7 +159,7 @@ public class DefaultBeanDefinitionDocumentReader implements BeanDefinitionDocume
 	/**
 	 * Return the descriptor for the XML resource that this parser works on.
 	 */
-	protected final XmlReaderContext getReaderContext() {
+	public final XmlReaderContext getReaderContext() {
 		return this.readerContext;
 	}
 
@@ -173,7 +177,7 @@ public class DefaultBeanDefinitionDocumentReader implements BeanDefinitionDocume
 	 * "import", "alias", "bean".
 	 * @param root the DOM root element of the document
 	 */
-	protected void parseBeanDefinitions(Element root, BeanDefinitionParserDelegate delegate) {
+	public void parseBeanDefinitions(Element root, BeanDefinitionParserDelegate delegate) {
 		if (delegate.isDefaultNamespace(root)) {
 			NodeList nl = root.getChildNodes();
 			for (int i = 0; i < nl.getLength(); i++) {
@@ -194,7 +198,7 @@ public class DefaultBeanDefinitionDocumentReader implements BeanDefinitionDocume
 		}
 	}
 
-	private void parseDefaultElement(Element ele, BeanDefinitionParserDelegate delegate) {
+	public void parseDefaultElement(Element ele, BeanDefinitionParserDelegate delegate) {
 		if (delegate.nodeNameEquals(ele, IMPORT_ELEMENT)) {
 			importBeanDefinitionResource(ele);
 		}
@@ -310,7 +314,7 @@ public class DefaultBeanDefinitionDocumentReader implements BeanDefinitionDocume
 	 * Process the given bean element, parsing the bean definition
 	 * and registering it with the registry.
 	 */
-	protected void processBeanDefinition(Element ele, BeanDefinitionParserDelegate delegate) {
+	public  void processBeanDefinition(Element ele, BeanDefinitionParserDelegate delegate) {
 		BeanDefinitionHolder bdHolder = delegate.parseBeanDefinitionElement(ele);
 		if (bdHolder != null) {
 			bdHolder = delegate.decorateBeanDefinitionIfRequired(ele, bdHolder);
