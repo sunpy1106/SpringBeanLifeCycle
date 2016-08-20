@@ -5,6 +5,7 @@ import java.io.InputStream;
 
 import org.springframework.beans.factory.BeanDefinitionStoreException;
 import org.springframework.beans.factory.support.DefaultListableBeanFactory;
+import org.springframework.beans.factory.xml.BeanDefinitionDocumentReader;
 import org.springframework.beans.factory.xml.XmlBeanDefinitionReader;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.support.EncodedResource;
@@ -33,7 +34,13 @@ public class ProgramBeanFactory {
 				//reader.doLoadBeanDefinitions(inputSource, encodedResource.getResource());
 				try {
 					Document doc = reader.doLoadDocument(inputSource, resource);
-					reader.registerBeanDefinitions(doc, resource);
+					//reader.registerBeanDefinitions(doc, resource);
+					BeanDefinitionDocumentReader documentReader = reader.createBeanDefinitionDocumentReader();
+					documentReader.setEnvironment(reader.getEnvironment());
+					int countBefore = reader.getRegistry().getBeanDefinitionCount();
+					documentReader.registerBeanDefinitions(doc, reader.createReaderContext(resource));
+					int res = reader.getRegistry().getBeanDefinitionCount() ;
+					System.out.println("Find " + res + " beans in total");
 				}
 				catch (BeanDefinitionStoreException ex) {
 					throw ex;
