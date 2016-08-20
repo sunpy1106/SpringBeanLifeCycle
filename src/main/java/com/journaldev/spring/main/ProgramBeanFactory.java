@@ -8,12 +8,13 @@ import org.springframework.beans.factory.support.DefaultListableBeanFactory;
 import org.springframework.beans.factory.xml.XmlBeanDefinitionReader;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.support.EncodedResource;
+import org.w3c.dom.Document;
 import org.xml.sax.InputSource;
 
 import com.journaldev.spring.service.MyAwareService;
 
 public class ProgramBeanFactory {
-	public static void main(String[] args){
+	public static void main(String[] args) throws Exception{
 		System.out.println("create resource");
 		ClassPathResource resource = new ClassPathResource("spring-aware.xml");
 		System.out.println("create bean factory");
@@ -29,7 +30,15 @@ public class ProgramBeanFactory {
 				if (encodedResource.getEncoding() != null) {
 					inputSource.setEncoding(encodedResource.getEncoding());
 				}
-				reader.doLoadBeanDefinitions(inputSource, encodedResource.getResource());
+				//reader.doLoadBeanDefinitions(inputSource, encodedResource.getResource());
+				try {
+					Document doc = reader.doLoadDocument(inputSource, resource);
+					reader.registerBeanDefinitions(doc, resource);
+				}
+				catch (BeanDefinitionStoreException ex) {
+					throw ex;
+				}
+				
 			}
 			finally {
 				inputStream.close();

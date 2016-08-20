@@ -75,5 +75,9 @@ public class MyAwareService implements ApplicationContextAware,
 			ApplicationEventPublisher applicationEventPublisher) {
 		System.out.println("setApplicationEventPublisher called");
 	}
+	
+	public void showDescription(){
+		System.out.println("now in class" + this.getClass().getName());
+	}
 
 }
