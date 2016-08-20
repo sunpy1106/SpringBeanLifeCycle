@@ -39,12 +39,12 @@ public class ProgramBeanFactory {
 			throw new BeanDefinitionStoreException(
 					"IOException parsing XML document from " + encodedResource.getResource(), ex);
 		}
-		reader.loadBeanDefinitions(resource);
+		//reader.loadBeanDefinitions(resource);
 		
 
 		System.out.println("get bean");
-		//MyAwareService service = factory.getBean("myAwareService",MyAwareService.class);
-		//service.showDescription();
+		MyAwareService service = factory.getBean("myAwareService",MyAwareService.class);
+		service.showDescription();
 		
 	}
 }
